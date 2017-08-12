@@ -6,19 +6,31 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ListView;
+import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity {
     private boolean isRunning;
     private Button left, right;
-    private int i;
+    private int i, lapCount;
     private Timer timer;
     private ClockTask clockTask;
     private UIHandler handler;
     private TextView clock;
+
+    private ListView list;
+    private SimpleAdapter adapter;
+    private String[] from = {"brad"};
+    private int[] to = {R.id.lap_content};
+    private List<Map<String,String>> data;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,7 +41,16 @@ public class MainActivity extends AppCompatActivity {
         clock = (TextView)findViewById(R.id.clock);
         timer = new Timer();
         handler = new UIHandler();
+
+        list = (ListView)findViewById(R.id.list);
+        initList();
     }
+    private void initList(){
+        data = new LinkedList<>();
+        adapter = new SimpleAdapter(this,data,R.layout.layout_lap,from, to);
+        list.setAdapter(adapter);
+    }
+
 
     // Reset / lap
     public void doLeft(View view){
@@ -66,9 +87,16 @@ public class MainActivity extends AppCompatActivity {
         }
     }
     private void doLap(){
-
+        Map<String,String> row = new HashMap<>();
+        row.put(from[0], ++lapCount + ". " + i);
+        data.add(0, row);
+        adapter.notifyDataSetChanged();
     }
     private void doReset(){
+        i = 0;
+        data.clear();
+        adapter.notifyDataSetChanged();
+        clock.setText("" + i);
 
     }
 
